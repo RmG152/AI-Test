@@ -2,13 +2,14 @@
   "site": {
     "title": "Portfolio de Aplicaciones IA",
     "description": "Explorando las mismas aplicaciones desarrolladas por diferentes sistemas de IA",
-    "author": "Tu Nombre",
+    "author": "Gemini. Idea original Robert. ",
     "theme": {
       "primaryColor": "#4f46e5",
       "sidebarBg": "#1f2937",
       "sidebarText": "#d1d5db",
       "sidebarHoverBg": "#374151",
-      "headerBg": "#ffffff"
+      "headerBg": "#1f2937",
+      "secondaryColor": "#d1d5db"
     }
   },
   "ais": {
