@@ -35,7 +35,7 @@ jobs:
       # 3. Ejecutar el script para generar structure.json
       # Corre el script que hemos creado para escanear los directorios
       - name: Generate structure.json
-        run: node ./scripts/generate-structure.mjs
+        run: node scripts/generate-structure.mjs
 
       # 4. Hacer commit del archivo structure.json generado
       # Si el script ha creado o modificado structure.json, este paso lo añade al repositorio
