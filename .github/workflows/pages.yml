@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20' # Usamos una versión LTS de Node.js
-          cache: 'npm' # Opcional: cachea las dependencias si las tuvieras
+        #   cache: 'npm' # Opcional: cachea las dependencias si las tuvieras
 
       # 3. Ejecutar el script para generar structure.json
       # Corre el script que hemos creado para escanear los directorios
