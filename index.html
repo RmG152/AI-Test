@@ -48,7 +48,7 @@
         <!-- Contenido principal -->
         <main class="flex-1 flex flex-col">
             <header id="main-header" class="shadow-md p-4 text-center transition-colors duration-300" style="background-color: var(--header-bg);color: var(--secondary-color)">
-                <h2 class="text-xl font-semibold text-gray-800">Selecciona un proyecto del menú</h2>
+                <h2 class="text-xl font-semibold">Selecciona un proyecto del menú</h2>
             </header>
             <div class="flex-1 p-4 bg-gray-200 dark:bg-gray-800">
                 <iframe id="content-frame" class="w-full h-full border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-white" title="Contenido de la aplicación"></iframe>
@@ -142,7 +142,7 @@
                         aiLink.addEventListener('click', (e) => {
                             e.preventDefault();
                             contentFrame.src = aiLink.dataset.path;
-                            mainHeader.innerHTML = `<h2 class="text-xl font-semibold text-gray-800">${aiLink.dataset.appName} - <span style="color: var(--primary-color);">${aiLink.dataset.aiName}</span></h2>`;
+                            mainHeader.innerHTML = `<h2 class="text-xl font-semibold ">${aiLink.dataset.appName} - <span style="color: var(--primary-color);">${aiLink.dataset.aiName}</span></h2>`;
                             
                             document.querySelectorAll('#navigation-menu a').forEach(link => link.style.backgroundColor = 'transparent');
                             aiLink.style.backgroundColor = 'var(--sidebar-hover-bg)';
