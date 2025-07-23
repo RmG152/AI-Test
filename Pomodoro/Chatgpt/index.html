@@ -1,13 +1,79 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#000000" />
-    <title>Multi Pomodoro</title>
-  </head>
-  <body class="bg-gray-100 text-gray-900">
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <title>Multi Pomodoro</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .pomodoro { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+    .btn { margin-left: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Pomodoros</h1>
+  <input type="text" id="name" placeholder="Nombre" />
+  <input type="number" id="minutes" value="25" min="1" />
+  <button onclick="addPomodoro()">Agregar</button>
+
+  <div id="container"></div>
+
+  <script>
+    const container = document.getElementById('container')
+    const pomodoros = []
+
+    function addPomodoro() {
+      const name = document.getElementById('name').value || 'Pomodoro'
+      const minutes = parseInt(document.getElementById('minutes').value) || 25
+      const id = Date.now()
+      const p = { id, name, seconds: minutes * 60, interval: null, running: false }
+      pomodoros.push(p)
+      render()
+    }
+
+    function toggle(id) {
+      const p = pomodoros.find(x => x.id === id)
+      if (!p.running) {
+        p.interval = setInterval(() => {
+          if (p.seconds > 0) {
+            p.seconds--
+            render()
+          } else {
+            clearInterval(p.interval)
+          }
+        }, 1000)
+      } else {
+        clearInterval(p.interval)
+      }
+      p.running = !p.running
+      render()
+    }
+
+    function remove(id) {
+      const index = pomodoros.findIndex(x => x.id === id)
+      if (pomodoros[index].interval) clearInterval(pomodoros[index].interval)
+      pomodoros.splice(index, 1)
+      render()
+    }
+
+    function format(s) {
+      const m = Math.floor(s / 60).toString().padStart(2, '0')
+      const sec = (s % 60).toString().padStart(2, '0')
+      return `${m}:${sec}`
+    }
+
+    function render() {
+      container.innerHTML = ''
+      pomodoros.forEach(p => {
+        const div = document.createElement('div')
+        div.className = 'pomodoro'
+        div.innerHTML = `
+          <strong>${p.name}</strong> - ${format(p.seconds)}
+          <button class="btn" onclick="toggle(${p.id})">${p.running ? 'Pausar' : 'Iniciar'}</button>
+          <button class="btn" onclick="remove(${p.id})">Eliminar</button>
+        `
+        container.appendChild(div)
+      })
+    }
+  </script>
+</body>
 </html>
