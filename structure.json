@@ -1,0 +1,62 @@
+{
+  "apps": [
+    {
+      "name": "Clorador-Salino",
+      "ais": [
+        {
+          "name": "Chatgpt",
+          "path": "Clorador-Salino/Chatgpt/index.html"
+        },
+        {
+          "name": "Claude",
+          "path": "Clorador-Salino/Claude/index.html"
+        },
+        {
+          "name": "Deepseek",
+          "path": "Clorador-Salino/Deepseek/index.html"
+        },
+        {
+          "name": "Gemini",
+          "path": "Clorador-Salino/Gemini/index.html"
+        },
+        {
+          "name": "Grok",
+          "path": "Clorador-Salino/Grok/index.html"
+        },
+        {
+          "name": "Le chat",
+          "path": "Clorador-Salino/Le chat/index.html"
+        }
+      ]
+    },
+    {
+      "name": "Pomodoro",
+      "ais": [
+        {
+          "name": "Chatgpt",
+          "path": "Pomodoro/Chatgpt/index.html"
+        },
+        {
+          "name": "Claude",
+          "path": "Pomodoro/Claude/index.html"
+        },
+        {
+          "name": "Deepseek",
+          "path": "Pomodoro/Deepseek/index.html"
+        },
+        {
+          "name": "Gemini",
+          "path": "Pomodoro/Gemini/index.html"
+        },
+        {
+          "name": "Grok",
+          "path": "Pomodoro/Grok/index.html"
+        },
+        {
+          "name": "Le chat",
+          "path": "Pomodoro/Le chat/index.html"
+        }
+      ]
+    }
+  ]
+}
