@@ -27,16 +27,37 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        #sidebar.collapsed {
+            width: 4rem;
+        }
+        
+        #sidebar.collapsed #sidebar-header,
+        #sidebar.collapsed #navigation-menu,
+        #sidebar.collapsed #sidebar-footer {
+            display: none;
+        }
+        
+        #sidebar.collapsed #toggle-sidebar svg {
+            transform: rotate(180deg);
+        }        
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900">
 
     <div class="flex h-screen">
         <!-- Barra lateral de navegación -->
-        <aside id="sidebar" class="w-72 flex flex-col p-4 overflow-y-auto shadow-lg transition-colors duration-300" style="background-color: var(--sidebar-bg); color: var(--sidebar-text);">
-            <header id="sidebar-header" class="mb-6 text-center">
-                <!-- El título se generará aquí -->
-            </header>
+        <aside id="sidebar" class="w-72 flex flex-col p-4 overflow-y-auto shadow-lg transition-all duration-300" style="background-color: var(--sidebar-bg); color: var(--sidebar-text);">
+            <div class="flex justify-between items-center mb-6">
+                <header id="sidebar-header" class="text-center">
+                    <!-- El título se generará aquí -->
+                </header>
+                <button id="toggle-sidebar" class="p-2 rounded-lg hover:bg-opacity-20 hover:bg-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                    </svg>
+                </button>
+            </div>
             <nav id="navigation-menu" class="flex-grow">
                 <div class="text-center p-8"><p>Cargando proyectos...</p></div>
             </nav>
@@ -164,6 +185,21 @@
                     appElement.appendChild(aiList);
                     menuContainer.appendChild(appElement);
                 });
+            }
+
+            // Añade esto al principio de la función
+            const sidebar = document.getElementById('sidebar');
+            const toggleButton = document.getElementById('toggle-sidebar');
+            
+            toggleButton.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                // Guardar preferencia del usuario
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            });
+            
+            // Recuperar estado anterior del sidebar
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                sidebar.classList.add('collapsed');
             }
         });
     </script>
