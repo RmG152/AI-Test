@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Sal para Piscina</title>
+</head>
+<body>
+    <h1>Calculadora de Sal para Piscina</h1>
+    <p>Ingresa los datos de tu piscina para calcular cuánta sal necesitas añadir.</p>
+    
+    <form id="saltForm">
+        <label for="volume">Volumen de la piscina (litros):</label><br>
+        <input type="number" id="volume" name="volume" min="0" step="1" required><br><br>
+        
+        <label for="currentPpm">Concentración actual de sal (ppm):</label><br>
+        <input type="number" id="currentPpm" name="currentPpm" min="0" step="1" required><br><br>
+        
+        <label for="desiredPpm">Concentración objetivo de sal (ppm):</label><br>
+        <input type="number" id="desiredPpm" name="desiredPpm" min="0" step="1" required><br><br>
+        
+        <button type="submit">Calcular</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script>
+        document.getElementById('saltForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const volume = parseFloat(document.getElementById('volume').value);
+            const currentPpm = parseFloat(document.getElementById('currentPpm').value);
+            const desiredPpm = parseFloat(document.getElementById('desiredPpm').value);
+            
+            if (desiredPpm <= currentPpm) {
+                document.getElementById('result').innerText = 'No es necesario añadir sal. La concentración objetivo es menor o igual a la actual.';
+            } else {
+                const saltToAdd = (volume * (desiredPpm - currentPpm)) / 1000000;
+                document.getElementById('result').innerText = `Debes añadir ${saltToAdd.toFixed(2)} kg de sal.`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi Pomodoro Timer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #e74c3c;
+            --secondary: #2c3e50;
+            --accent: #3498db;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --work-color: #e74c3c;
+            --short-break-color: #3498db;
+            --long-break-color: #2ecc71;
+            --paused-color: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(44, 62, 80, 0.7);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: var(--light);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--light);
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-accent {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .pomodoro-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .pomodoro-card {
+            background: rgba(44, 62, 80, 0.85);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .pomodoro-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        }
+        
+        .pomodoro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .pomodoro-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--light);
+        }
+        
+        .timer-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        
+        .state-indicator {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .work {
+            background-color: var(--work-color);
+        }
+        
+        .short-break {
+            background-color: var(--short-break-color);
+        }
+        
+        .long-break {
+            background-color: var(--long-break-color);
+        }
+        
+        .paused {
+            background-color: var(--paused-color);
+        }
+        
+        .cycle-info {
+            text-align: center;
+            font-size: 1.1rem;
+            margin: 10px 0;
+            color: var(--light);
+            opacity: 0.9;
+        }
+        
+        .pomodoro-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .pomodoro-btn {
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .delete-btn {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: var(--secondary);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: var(--light);
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus {
+            outline: 2px solid var(--accent);
+        }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            padding: 20px;
+            color: var(--light);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .pomodoro-container {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .timer-display {
+                font-size: 2.8rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+        
+        /* Animation for timers */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        
+        .active-timer {
+            animation: pulse 2s infinite;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            background: var(--success);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-clock"></i> Multi Pomodoro Timer</h1>
+            <p class="subtitle">Controla múltiples temporizadores Pomodoro simultáneamente. Ideal para gestionar varias tareas o proyectos a la vez.</p>
+            
+            <div class="controls">
+                <button class="btn-primary" id="add-pomodoro">
+                    <i class="fas fa-plus-circle"></i> Nuevo Pomodoro
+                </button>
+                <button class="btn-secondary" id="reset-all">
+                    <i class="fas fa-redo"></i> Reiniciar Todos
+                </button>
+                <button class="btn-accent" id="pause-all">
+                    <i class="fas fa-pause"></i> Pausar Todos
+                </button>
+                <button class="btn-success" id="export-app">
+                    <i class="fas fa-download"></i> Exportar App
+                </button>
+            </div>
+        </header>
+        
+        <div class="pomodoro-container" id="pomodoro-container">
+            <!-- Pomodoros will be added here dynamically -->
+        </div>
+        
+        <div class="footer">
+            <p>Pomodoro Technique: 25 minutos de trabajo + 5 minutos de descanso. Cada 4 ciclos, descanso largo de 15 minutos.</p>
+            <p>Esta aplicación se puede exportar como aplicación nativa de Android</p>
+        </div>
+    </div>
+    
+    <!-- Modal for creating new pomodoros -->
+    <div class="modal" id="pomodoro-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Crear Nuevo Pomodoro</h2>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <form id="pomodoro-form">
+                <div class="form-group">
+                    <label for="pomodoro-name">Nombre del Pomodoro</label>
+                    <input type="text" id="pomodoro-name" placeholder="Ej: Proyecto X" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="work-time">Tiempo de trabajo (minutos)</label>
+                    <input type="number" id="work-time" min="1" max="60" value="25" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="short-break">Descanso corto (minutos)</label>
+                    <input type="number" id="short-break" min="1" max="30" value="5" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="long-break">Descanso largo (minutos)</label>
+                    <input type="number" id="long-break" min="1" max="60" value="15" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cycles">Ciclos hasta descanso largo</label>
+                    <input type="number" id="cycles" min="1" max="10" value="4" required>
+                </div>
+                
+                <button type="submit" class="btn-primary" style="width: 100%;">
+                    <i class="fas fa-plus"></i> Crear Pomodoro
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Export instructions modal -->
+    <div class="modal" id="export-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Exportar como App Nativa Android</h2>
+                <button class="close-modal" id="close-export-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <p>Sigue estos pasos para convertir esta aplicación web en una app nativa de Android:</p>
+                <ol style="padding-left: 20px; margin: 15px 0;">
+                    <li>Instala <a href="https://nodejs.org/" target="_blank">Node.js</a> en tu computadora</li>
+                    <li>Instala Capacitor CLI: <code>npm install -g @capacitor/cli</code></li>
+                    <li>Crea una carpeta para tu proyecto y guarda este archivo como <code>index.html</code></li>
+                    <li>Inicializa un proyecto Capacitor: 
+                        <pre>npx cap init</pre>
+                    </li>
+                    <li>Añade la plataforma Android:
+                        <pre>npx cap add android</pre>
+                    </li>
+                    <li>Copia los archivos al proyecto Android:
+                        <pre>npx cap copy</pre>
+                    </li>
+                    <li>Abre el proyecto en Android Studio:
+                        <pre>npx cap open android</pre>
+                    </li>
+                    <li>En Android Studio, construye el APK o ejecuta en un emulador/dispositivo</li>
+                </ol>
+                <p>¡Listo! Tendrás una aplicación nativa de Android con todas las funcionalidades.</p>
+            </div>
+            <button class="btn-accent" id="close-export-btn" style="width: 100%;">
+                <i class="fas fa-check"></i> Entendido
+            </button>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">¡Tiempo completado!</div>
+
+    <script>
+        // Pomodoro class to manage each timer
+        class Pomodoro {
+            constructor(id, name, workTime, shortBreak, longBreak, cycles) {
+                this.id = id;
+                this.name = name;
+                this.workTime = workTime * 60; // convert to seconds
+                this.shortBreak = shortBreak * 60;
+                this.longBreak = longBreak * 60;
+                this.cycles = cycles;
+                this.currentState = 'paused'; // 'work', 'short_break', 'long_break'
+                this.currentCycle = 1;
+                this.timeLeft = this.workTime;
+                this.interval = null;
+                this.isActive = false;
+            }
+            
+            start() {
+                if (this.interval) return;
+                
+                this.isActive = true;
+                this.interval = setInterval(() => {
+                    this.timeLeft--;
+                    
+                    if (this.timeLeft <= 0) {
+                        clearInterval(this.interval);
+                        this.interval = null;
+                        this.nextState();
+                        showNotification(`${this.name}: ¡Tiempo completado!`);
+                    }
+                    
+                    updatePomodoroDisplay(this.id);
+                }, 1000);
+                
+                if (this.currentState === 'paused') {
+                    this.currentState = 'work';
+                }
+                
+                updatePomodoroDisplay(this.id);
+            }
+            
+            pause() {
+                if (this.interval) {
+                    clearInterval(this.interval);
+                    this.interval = null;
+                    this.currentState = 'paused';
+                    this.isActive = false;
+                    updatePomodoroDisplay(this.id);
+                }
+            }
+            
+            reset() {
+                if (this.interval) {
+                    clearInterval(this.interval);
+                    this.interval = null;
+                }
+                
+                this.currentState = 'work';
+                this.currentCycle = 1;
+                this.timeLeft = this.workTime;
+                this.isActive = false;
+                updatePomodoroDisplay(this.id);
+            }
+            
+            nextState() {
+                if (this.currentState === 'work') {
+                    // Check if it's time for a long break
+                    if (this.currentCycle % this.cycles === 0) {
+                        this.currentState = 'long_break';
+                        this.timeLeft = this.longBreak;
+                    } else {
+                        this.currentState = 'short_break';
+                        this.timeLeft = this.shortBreak;
+                    }
+                } else { // Coming from a break
+                    this.currentCycle++;
+                    if (this.currentCycle > this.cycles) {
+                        this.currentCycle = 1;
+                    }
+                    this.currentState = 'work';
+                    this.timeLeft = this.workTime;
+                }
+                
+                this.start(); // Automatically start next state
+            }
+            
+            getFormattedTime() {
+                const minutes = Math.floor(this.timeLeft / 60);
+                const seconds = this.timeLeft % 60;
+                return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            getStateName() {
+                switch(this.currentState) {
+                    case 'work': return 'Trabajando';
+                    case 'short_break': return 'Descanso Corto';
+                    case 'long_break': return 'Descanso Largo';
+                    case 'paused': return 'Pausado';
+                    default: return '';
+                }
+            }
+            
+            getStateClass() {
+                switch(this.currentState) {
+                    case 'work': return 'work';
+                    case 'short_break': return 'short-break';
+                    case 'long_break': return 'long-break';
+                    case 'paused': return 'paused';
+                    default: return '';
+                }
+            }
+        }
+        
+        // App state
+        let pomodoros = [];
+        let nextId = 1;
+        
+        // DOM Elements
+        const pomodoroContainer = document.getElementById('pomodoro-container');
+        const addPomodoroBtn = document.getElementById('add-pomodoro');
+        const resetAllBtn = document.getElementById('reset-all');
+        const pauseAllBtn = document.getElementById('pause-all');
+        const exportAppBtn = document.getElementById('export-app');
+        const pomodoroModal = document.getElementById('pomodoro-modal');
+        const exportModal = document.getElementById('export-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const closeExportModalBtn = document.getElementById('close-export-modal');
+        const closeExportBtn = document.getElementById('close-export-btn');
+        const pomodoroForm = document.getElementById('pomodoro-form');
+        const notification = document.getElementById('notification');
+        
+        // Initialize the app
+        function init() {
+            // Load sample pomodoros for demo
+            pomodoros.push(new Pomodoro(nextId++, "Trabajo", 25, 5, 15, 4));
+            pomodoros.push(new Pomodoro(nextId++, "Estudio", 30, 5, 20, 3));
+            pomodoros.push(new Pomodoro(nextId++, "Proyecto", 45, 10, 25, 2));
+            
+            renderPomodoros();
+            setupEventListeners();
+        }
+        
+        // Render all pomodoros
+        function renderPomodoros() {
+            pomodoroContainer.innerHTML = '';
+            
+            pomodoros.forEach(pomodoro => {
+                const card = document.createElement('div');
+                card.className = `pomodoro-card ${pomodoro.isActive ? 'active-timer' : ''}`;
+                card.id = `pomodoro-${pomodoro.id}`;
+                card.innerHTML = `
+                    <div class="pomodoro-header">
+                        <div class="pomodoro-name">${pomodoro.name}</div>
+                        <button class="delete-btn pomodoro-btn" data-id="${pomodoro.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="timer-display">${pomodoro.getFormattedTime()}</div>
+                    
+                    <div class="state-indicator ${pomodoro.getStateClass()}">
+                        ${pomodoro.getStateName()}
+                    </div>
+                    
+                    <div class="cycle-info">
+                        Ciclo: ${pomodoro.currentCycle} de ${pomodoro.cycles}
+                    </div>
+                    
+                    <div class="pomodoro-controls">
+                        <button class="btn-primary pomodoro-btn" data-action="start" data-id="${pomodoro.id}">
+                            <i class="fas fa-play"></i> Iniciar
+                        </button>
+                        <button class="btn-secondary pomodoro-btn" data-action="pause" data-id="${pomodoro.id}">
+                            <i class="fas fa-pause"></i> Pausar
+                        </button>
+                        <button class="btn-accent pomodoro-btn" data-action="reset" data-id="${pomodoro.id}">
+                            <i class="fas fa-redo"></i> Reiniciar
+                        </button>
+                        <button class="pomodoro-btn delete-btn" data-action="delete" data-id="${pomodoro.id}">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                `;
+                pomodoroContainer.appendChild(card);
+            });
+        }
+        
+        // Update a specific pomodoro display
+        function updatePomodoroDisplay(id) {
+            const pomodoro = pomodoros.find(p => p.id === id);
+            if (!pomodoro) return;
+            
+            const card = document.getElementById(`pomodoro-${id}`);
+            if (!card) return;
+            
+            // Update time display
+            const timerDisplay = card.querySelector('.timer-display');
+            if (timerDisplay) {
+                timerDisplay.textContent = pomodoro.getFormattedTime();
+            }
+            
+            // Update state indicator
+            const stateIndicator = card.querySelector('.state-indicator');
+            if (stateIndicator) {
+                stateIndicator.className = `state-indicator ${pomodoro.getStateClass()}`;
+                stateIndicator.textContent = pomodoro.getStateName();
+            }
+            
+            // Update cycle info
+            const cycleInfo = card.querySelector('.cycle-info');
+            if (cycleInfo) {
+                cycleInfo.textContent = `Ciclo: ${pomodoro.currentCycle} de ${pomodoro.cycles}`;
+            }
+            
+            // Update active animation
+            if (pomodoro.isActive) {
+                card.classList.add('active-timer');
+            } else {
+                card.classList.remove('active-timer');
+            }
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Event Listeners setup
+        function setupEventListeners() {
+            // Add new pomodoro button
+            addPomodoroBtn.addEventListener('click', () => {
+                pomodoroModal.style.display = 'flex';
+            });
+            
+            // Close modal buttons
+            closeModalBtn.addEventListener('click', () => {
+                pomodoroModal.style.display = 'none';
+            });
+            
+            closeExportModalBtn.addEventListener('click', () => {
+                exportModal.style.display = 'none';
+            });
+            
+            closeExportBtn.addEventListener('click', () => {
+                exportModal.style.display = 'none';
+            });
+            
+            // Export app button
+            exportAppBtn.addEventListener('click', () => {
+                exportModal.style.display = 'flex';
+            });
+            
+            // Form submission
+            pomodoroForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const name = document.getElementById('pomodoro-name').value;
+                const workTime = parseInt(document.getElementById('work-time').value);
+                const shortBreak = parseInt(document.getElementById('short-break').value);
+                const longBreak = parseInt(document.getElementById('long-break').value);
+                const cycles = parseInt(document.getElementById('cycles').value);
+                
+                pomodoros.push(new Pomodoro(nextId++, name, workTime, shortBreak, longBreak, cycles));
+                renderPomodoros();
+                
+                pomodoroForm.reset();
+                pomodoroModal.style.display = 'none';
+            });
+            
+            // Reset all pomodoros
+            resetAllBtn.addEventListener('click', () => {
+                pomodoros.forEach(p => p.reset());
+                renderPomodoros();
+                showNotification("Todos los pomodoros han sido reiniciados");
+            });
+            
+            // Pause all pomodoros
+            pauseAllBtn.addEventListener('click', () => {
+                pomodoros.forEach(p => p.pause());
+                renderPomodoros();
+                showNotification("Todos los pomodoros han sido pausados");
+            });
+            
+            // Delegated event handling for pomodoro cards
+            pomodoroContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.pomodoro-btn');
+                if (!btn) return;
+                
+                const id = parseInt(btn.dataset.id);
+                const action = btn.dataset.action;
+                const pomodoro = pomodoros.find(p => p.id === id);
+                
+                if (!pomodoro) return;
+                
+                switch(action) {
+                    case 'start':
+                        pomodoro.start();
+                        break;
+                    case 'pause':
+                        pomodoro.pause();
+                        break;
+                    case 'reset':
+                        pomodoro.reset();
+                        break;
+                    case 'delete':
+                        pomodoros = pomodoros.filter(p => p.id !== id);
+                        renderPomodoros();
+                        break;
+                }
+            });
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === pomodoroModal) {
+                    pomodoroModal.style.display = 'none';
+                }
+                if (e.target === exportModal) {
+                    exportModal.style.display = 'none';
+                }
+            });
+        }
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

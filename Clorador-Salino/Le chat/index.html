@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Sal para Piscina</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="number"] {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calculadora de Sal para Piscina</h1>
+    <form id="piscinaForm">
+        <div class="form-group">
+            <label for="volumen">Volumen de la piscina (litros):</label>
+            <input type="number" id="volumen" required>
+        </div>
+        <div class="form-group">
+            <label for="ppmActual">Concentración actual de sal (ppm):</label>
+            <input type="number" id="ppmActual" required>
+        </div>
+        <div class="form-group">
+            <label for="ppmObjetivo">Concentración deseada de sal (ppm):</label>
+            <input type="number" id="ppmObjetivo" required>
+        </div>
+        <button type="submit">Calcular</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('piscinaForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const volumen = parseFloat(document.getElementById('volumen').value);
+            const ppmActual = parseFloat(document.getElementById('ppmActual').value);
+            const ppmObjetivo = parseFloat(document.getElementById('ppmObjetivo').value);
+
+            if(ppmObjetivo <= ppmActual) {
+                alert("La concentración deseada debe ser mayor que la concentración actual.");
+                return;
+            }
+
+            const diferenciaPpm = ppmObjetivo - ppmActual;
+            const cantidadSal = (volumen / 1000) * (diferenciaPpm / 1000);
+
+            document.getElementById('result').innerText = `Cantidad de sal necesaria: ${cantidadSal.toFixed(2)} kg.`;
+        });
+    </script>
+</body>
+</html>

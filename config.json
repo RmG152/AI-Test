@@ -1,0 +1,70 @@
+{
+  "site": {
+    "title": "Portfolio de Aplicaciones IA",
+    "description": "Explorando las mismas aplicaciones desarrolladas por diferentes sistemas de IA",
+    "author": "Tu Nombre",
+    "theme": {
+      "primaryColor": "#4f46e5",
+      "sidebarBg": "#1f2937",
+      "sidebarText": "#d1d5db",
+      "sidebarHoverBg": "#374151",
+      "headerBg": "#ffffff"
+    }
+  },
+  "ais": {
+    "gemini": {
+      "name": "Gemini (Google)",
+      "color": "#4285F4",
+      "icon": "✨"
+    },
+    "chatgpt": {
+      "name": "ChatGPT (OpenAI)",
+      "color": "#74aa9c",
+      "icon": "💬"
+    },
+    "claude": {
+      "name": "Claude (Anthropic)",
+      "color": "#d97a51",
+      "icon": "🤖"
+    },
+    "deepseek": {
+      "name": "DeepSeek",
+      "color": "#1a73e8",
+      "icon": "🐟"
+    },
+    "lechat": {
+      "name": "Le Chat (Mistral)",
+      "color": "#ff7000",
+      "icon": "🇫🇷"
+    },
+    "grok": {
+      "name": "Grok (xAI)",
+      "color": "#1e1e1e",
+      "icon": "🚀"
+    },
+    "copilot": {
+      "name": "Copilot (Microsoft)",
+      "color": "#0078d4",
+      "icon": "🚁"
+    },
+    "llama": {
+      "name": "Llama (Meta)",
+      "color": "#1877f2",
+      "icon": "🦙"
+    }
+  },
+  "structure": {
+    "ignoreFolders": [
+      ".git",
+      ".github",
+      "node_modules",
+      "scripts",
+      ".vscode"
+    ],
+    "indexFiles": [
+      "index.html",
+      "app.html",
+      "main.html"
+    ]
+  }
+}

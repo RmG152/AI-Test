@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi Pomodoro App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .pomodoro {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Multi Pomodoro App</h1>
+    <div id="pomodoros"></div>
+    <button onclick="addPomodoro()">Añadir Pomodoro</button>
+
+    <script>
+        let pomodoros = [];
+
+        function addPomodoro() {
+            const pomodoroId = Date.now().toString();
+            const pomodoroElement = document.createElement('div');
+            pomodoroElement.className = 'pomodoro';
+            pomodoroElement.id = pomodoroId;
+            pomodoroElement.innerHTML = `
+                <h2>Pomodoro ${pomodoroId}</h2>
+                <p id="timer-${pomodoroId}">25:00</p>
+                <button onclick="startPomodoro('${pomodoroId}')">Iniciar</button>
+                <button onclick="pausePomodoro('${pomodoroId}')">Pausar</button>
+                <button onclick="resetPomodoro('${pomodoroId}')">Reiniciar</button>
+                <button onclick="deletePomodoro('${pomodoroId}')">Eliminar</button>
+            `;
+            document.getElementById('pomodoros').appendChild(pomodoroElement);
+            pomodoros.push({
+                id: pomodoroId,
+                timeLeft: 25 * 60,
+                intervalId: null,
+                isRunning: false
+            });
+        }
+
+        function startPomodoro(id) {
+            const pomodoro = pomodoros.find(p => p.id === id);
+            if (pomodoro && !pomodoro.isRunning) {
+                pomodoro.isRunning = true;
+                pomodoro.intervalId = setInterval(() => {
+                    pomodoro.timeLeft--;
+                    updateTimerDisplay(id, pomodoro.timeLeft);
+                    if (pomodoro.timeLeft <= 0) {
+                        clearInterval(pomodoro.intervalId);
+                        alert(`¡Pomodoro ${id} terminado!`);
+                    }
+                }, 1000);
+            }
+        }
+
+        function pausePomodoro(id) {
+            const pomodoro = pomodoros.find(p => p.id === id);
+            if (pomodoro && pomodoro.isRunning) {
+                clearInterval(pomodoro.intervalId);
+                pomodoro.isRunning = false;
+            }
+        }
+
+        function resetPomodoro(id) {
+            const pomodoro = pomodoros.find(p => p.id === id);
+            if (pomodoro) {
+                clearInterval(pomodoro.intervalId);
+                pomodoro.timeLeft = 25 * 60;
+                pomodoro.isRunning = false;
+                updateTimerDisplay(id, pomodoro.timeLeft);
+            }
+        }
+
+        function deletePomodoro(id) {
+            const pomodoroIndex = pomodoros.findIndex(p => p.id === id);
+            if (pomodoroIndex !== -1) {
+                clearInterval(pomodoros[pomodoroIndex].intervalId);
+                pomodoros.splice(pomodoroIndex, 1);
+                document.getElementById(id).remove();
+            }
+        }
+
+        function updateTimerDisplay(id, timeLeft) {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById(`timer-${id}`).textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+    </script>
+</body>
+</html>

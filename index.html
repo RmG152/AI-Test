@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargando Portfolio...</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-bg: #1f2937;
+            --sidebar-text: #d1d5db;
+            --sidebar-hover-bg: #374151;
+            --header-bg: #ffffff;
+            --primary-color: #4f46e5;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+
+    <div class="flex h-screen">
+        <!-- Barra lateral de navegación -->
+        <aside id="sidebar" class="w-72 flex flex-col p-4 overflow-y-auto shadow-lg transition-colors duration-300" style="background-color: var(--sidebar-bg); color: var(--sidebar-text);">
+            <header id="sidebar-header" class="mb-6 text-center">
+                <!-- El título se generará aquí -->
+            </header>
+            <nav id="navigation-menu" class="flex-grow">
+                <div class="text-center p-8"><p>Cargando proyectos...</p></div>
+            </nav>
+            <footer id="sidebar-footer" class="text-center text-xs mt-4" style="color: var(--sidebar-text);">
+                <!-- El autor se generará aquí -->
+            </footer>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="flex-1 flex flex-col">
+            <header id="main-header" class="shadow-md p-4 text-center transition-colors duration-300" style="background-color: var(--header-bg);">
+                <h2 class="text-xl font-semibold text-gray-800">Selecciona un proyecto del menú</h2>
+            </header>
+            <div class="flex-1 p-4 bg-gray-200 dark:bg-gray-800">
+                <iframe id="content-frame" class="w-full h-full border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-white" title="Contenido de la aplicación"></iframe>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const getRepoBaseUrl = () => {
+                const pathParts = window.location.pathname.split('/').filter(part => part !== '');
+                if (pathParts.length > 0 && window.location.hostname.includes('github.io')) {
+                    return `/${pathParts[0]}`;
+                }
+                return '';
+            };
+            const baseUrl = getRepoBaseUrl();
+            const timestamp = `v=${new Date().getTime()}`;
+
+            // Carga ambos ficheros de configuración y estructura
+            Promise.all([
+                fetch(`${baseUrl}/config.json?${timestamp}`).then(res => res.json()),
+                fetch(`${baseUrl}/structure.json?${timestamp}`).then(res => res.json())
+            ]).then(([config, structure]) => {
+                applyConfig(config);
+                buildMenu(config, structure);
+            }).catch(error => {
+                console.error("Error al cargar la configuración o la estructura:", error);
+                const menuContainer = document.getElementById('navigation-menu');
+                menuContainer.innerHTML = `<div class="text-center p-4 bg-red-100 text-red-700 rounded-md"><p class="font-bold">Error al cargar</p><p class="text-sm">No se pudo encontrar 'config.json' o 'structure.json'.</p></div>`;
+            });
+
+            function applyConfig(config) {
+                // Aplicar título y metadatos
+                document.title = config.site.title;
+                
+                // Aplicar estilos y colores del tema
+                const root = document.documentElement;
+                root.style.setProperty('--sidebar-bg', config.site.theme.sidebarBg);
+                root.style.setProperty('--sidebar-text', config.site.theme.sidebarText);
+                root.style.setProperty('--sidebar-hover-bg', config.site.theme.sidebarHoverBg);
+                root.style.setProperty('--header-bg', config.site.theme.headerBg);
+                root.style.setProperty('--primary-color', config.site.theme.primaryColor);
+
+                // Rellenar cabecera y pie de la barra lateral
+                document.getElementById('sidebar-header').innerHTML = `<h1 class="text-2xl font-bold" style="color: var(--primary-color);">${config.site.title}</h1><p class="text-sm">${config.site.description}</p>`;
+                document.getElementById('sidebar-footer').innerHTML = `<p>Hecho por ${config.site.author}</p>`;
+            }
+
+            function buildMenu(config, structure) {
+                const menuContainer = document.getElementById('navigation-menu');
+                const contentFrame = document.getElementById('content-frame');
+                const mainHeader = document.getElementById('main-header');
+                menuContainer.innerHTML = '';
+
+                if (!structure.apps || structure.apps.length === 0) {
+                    menuContainer.innerHTML = '<p class="text-center">No se encontraron proyectos.</p>';
+                    return;
+                }
+
+                structure.apps.forEach(app => {
+                    const appElement = document.createElement('div');
+                    appElement.className = 'mb-4 fade-in';
+
+                    const appButton = document.createElement('button');
+                    appButton.className = 'w-full text-left font-bold text-lg p-3 rounded-md flex justify-between items-center';
+                    appButton.style.color = 'var(--sidebar-text)';
+                    appButton.innerHTML = `<span>${app.name}</span><svg class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
+                    appButton.onmouseover = () => appButton.style.backgroundColor = 'var(--sidebar-hover-bg)';
+                    appButton.onmouseout = () => appButton.style.backgroundColor = 'transparent';
+
+                    const aiList = document.createElement('ul');
+                    aiList.className = 'pl-4 mt-2 hidden space-y-1';
+
+                    app.ais.forEach(ai => {
+                        const aiKey = ai.name.toLowerCase();
+                        const aiDetails = config.ais[aiKey] || { name: ai.name, icon: '📁', color: '#888' };
+                        
+                        const aiItem = document.createElement('li');
+                        const aiLink = document.createElement('a');
+                        aiLink.href = '#';
+                        aiLink.className = 'block p-2 text-sm rounded-md flex items-center gap-3';
+                        aiLink.style.color = 'var(--sidebar-text)';
+                        aiLink.innerHTML = `<span style="color: ${aiDetails.color};">${aiDetails.icon}</span> <span>${aiDetails.name}</span>`;
+                        
+                        aiLink.dataset.path = `${baseUrl}/${ai.path}`;
+                        aiLink.dataset.appName = app.name;
+                        aiLink.dataset.aiName = aiDetails.name;
+
+                        aiLink.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            contentFrame.src = aiLink.dataset.path;
+                            mainHeader.innerHTML = `<h2 class="text-xl font-semibold text-gray-800">${aiLink.dataset.appName} - <span style="color: var(--primary-color);">${aiLink.dataset.aiName}</span></h2>`;
+                            
+                            document.querySelectorAll('#navigation-menu a').forEach(link => link.style.backgroundColor = 'transparent');
+                            aiLink.style.backgroundColor = 'var(--sidebar-hover-bg)';
+                        });
+                        
+                        aiLink.onmouseover = () => { if(aiLink.style.backgroundColor === 'transparent' || !aiLink.style.backgroundColor) aiLink.style.backgroundColor = 'var(--sidebar-hover-bg)'; };
+                        aiLink.onmouseout = () => { if(aiLink.style.backgroundColor !== 'var(--primary-color)') aiLink.style.backgroundColor = 'transparent'; };
+
+                        aiItem.appendChild(aiLink);
+                        aiList.appendChild(aiItem);
+                    });
+
+                    appButton.addEventListener('click', () => {
+                        aiList.classList.toggle('hidden');
+                        appButton.querySelector('svg').classList.toggle('rotate-180');
+                    });
+
+                    appElement.appendChild(appButton);
+                    appElement.appendChild(aiList);
+                    menuContainer.appendChild(appElement);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

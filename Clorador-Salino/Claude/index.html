@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Sal para Piscina</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        
+        .pool-icon {
+            text-align: center;
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 1.1em;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .unit {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+        }
+        
+        .result h2 {
+            color: white;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        
+        .result .amount {
+            font-size: 3em;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .result .unit-label {
+            color: white;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .tips {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .tips h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .tips ul {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .tips li {
+            margin-bottom: 5px;
+        }
+        
+        .error {
+            background: #ff4757;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="pool-icon">🏊‍♂️</div>
+        <h1>Calculadora de Sal</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">Para piscinas de cloración salina</p>
+        
+        <form id="calculadora">
+            <div class="form-group">
+                <label for="volumen">Volumen de la piscina</label>
+                <input type="number" id="volumen" placeholder="40000" min="1" step="any">
+                <div class="unit">Litros</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="ppmActual">Concentración actual</label>
+                <input type="number" id="ppmActual" placeholder="2000" min="0" step="any">
+                <div class="unit">PPM (partes por millón)</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="ppmObjetivo">Concentración objetivo</label>
+                <input type="number" id="ppmObjetivo" placeholder="3500" min="1" step="any">
+                <div class="unit">PPM (recomendado: 3000-4000)</div>
+            </div>
+            
+            <button type="submit">🧮 Calcular Sal Necesaria</button>
+        </form>
+        
+        <div id="error" class="error"></div>
+        
+        <div id="resultado" class="result">
+            <h2>Sal necesaria:</h2>
+            <div class="amount" id="cantidadSal">0</div>
+            <div class="unit-label">kilogramos</div>
+        </div>
+        
+        <div class="tips">
+            <h3>💡 Consejos importantes</h3>
+            <ul>
+                <li>Usa sal específica para piscinas (sin yodo ni antiaglomerantes)</li>
+                <li>Añade la sal gradualmente, en varias tandas</li>
+                <li>Espera 24 horas entre adiciones para que se disuelva</li>
+                <li>Mantén la bomba funcionando 8 horas después de añadir sal</li>
+                <li>Mide siempre antes de añadir más sal</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function calcularSal() {
+            console.log('Función calcularSal ejecutada');
+            
+            // Obtener valores y limpiar espacios
+            const volumenStr = document.getElementById('volumen').value.trim();
+            const ppmActualStr = document.getElementById('ppmActual').value.trim();
+            const ppmObjetivoStr = document.getElementById('ppmObjetivo').value.trim();
+            
+            const volumen = parseFloat(volumenStr);
+            const ppmActual = parseFloat(ppmActualStr);
+            const ppmObjetivo = parseFloat(ppmObjetivoStr);
+            
+            console.log('Valores string:', volumenStr, ppmActualStr, ppmObjetivoStr);
+            console.log('Valores numéricos:', volumen, ppmActual, ppmObjetivo);
+            
+            // Limpiar mensajes anteriores
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('resultado').style.display = 'none';
+            
+            // Validaciones
+            if (isNaN(volumen) || volumen <= 0) {
+                mostrarError('Introduce un volumen válido mayor a 0.');
+                return;
+            }
+            
+            if (isNaN(ppmActual) || ppmActual < 0) {
+                mostrarError('Introduce una concentración actual válida (0 o mayor).');
+                return;
+            }
+            
+            if (isNaN(ppmObjetivo) || ppmObjetivo <= 0) {
+                mostrarError('Introduce una concentración objetivo válida mayor a 0.');
+                return;
+            }
+            
+            if (ppmObjetivo <= ppmActual) {
+                mostrarError('La concentración objetivo debe ser mayor a la actual. ¡Ya tienes suficiente sal!');
+                return;
+            }
+            
+            if (ppmObjetivo > 6000) {
+                mostrarError('Concentración objetivo muy alta. Máximo recomendado: 6000 PPM.');
+                return;
+            }
+            
+            // Calcular sal necesaria
+            // Fórmula: Sal (kg) = Volumen (L) × (PPM objetivo - PPM actual) / 1,000,000
+            // Porque 1 PPM = 1 mg/L, y necesitamos convertir mg a kg
+            const diferenciaPPM = ppmObjetivo - ppmActual;
+            const salNecesaria = (volumen * diferenciaPPM) / 1000000;
+            
+            console.log('Diferencia PPM:', diferenciaPPM);
+            console.log('Cálculo:', volumen, 'x', diferenciaPPM, '/ 1000000 =', salNecesaria);
+            
+            // Mostrar resultado
+            document.getElementById('cantidadSal').textContent = salNecesaria.toFixed(1);
+            document.getElementById('resultado').style.display = 'block';
+            
+            // Scroll suave al resultado
+            setTimeout(() => {
+                document.getElementById('resultado').scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+        
+        function mostrarError(mensaje) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = mensaje;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+        
+        // Event listener para el formulario
+        document.addEventListener('DOMContentLoaded', function() {
+            // Valor por defecto
+            document.getElementById('ppmObjetivo').value = '4000';
+            document.getElementById('volumen').value = '38000';
+            
+            // Event listener para el botón
+            document.getElementById('calculadora').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calcularSal();
+            });
+        });
+    </script>
+</body>
+</html>

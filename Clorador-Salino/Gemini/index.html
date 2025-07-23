@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Sal para Piscina</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f9ff; /* Light blue background */
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8">
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-md border-t-4 border-blue-500">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Calculadora de Sal para Piscina</h1>
+
+        <div class="space-y-4">
+            <!-- Volumen de la piscina -->
+            <div>
+                <label for="poolVolume" class="block text-gray-700 text-sm font-medium mb-1">Volumen de la piscina (m³):</label>
+                <input type="number" id="poolVolume" placeholder="Ej: 50" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900 shadow-sm" min="1">
+            </div>
+
+            <!-- Nivel de sal actual -->
+            <div>
+                <label for="currentSalt" class="block text-gray-700 text-sm font-medium mb-1">Nivel de sal actual (ppm):</label>
+                <input type="number" id="currentSalt" placeholder="Ej: 3000 (equiv. a 3 g/L)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900 shadow-sm" min="0">
+            </div>
+
+            <!-- Nivel de sal deseado -->
+            <div>
+                <label for="desiredSalt" class="block text-gray-700 text-sm font-medium mb-1">Nivel de sal deseado (ppm):</label>
+                <input type="number" id="desiredSalt" placeholder="Ej: 4000 (equiv. a 4 g/L)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900 shadow-sm" min="0">
+            </div>
+
+            <!-- Botón de cálculo -->
+            <button id="calculateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-300 ease-in-out shadow-md hover:shadow-lg">
+                Calcular Sal a Añadir
+            </button>
+
+            <!-- Área de resultado -->
+            <div id="resultArea" class="mt-6 p-4 bg-blue-100 border border-blue-200 rounded-lg text-center text-gray-800 text-lg font-semibold hidden">
+                <!-- El resultado se mostrará aquí -->
+            </div>
+
+            <!-- Área de mensajes de error/información -->
+            <div id="messageArea" class="mt-4 p-3 bg-red-100 border border-red-200 rounded-lg text-red-700 text-sm hidden">
+                <!-- Los mensajes de error o información se mostrarán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('calculateBtn').addEventListener('click', calculateSalt);
+
+        function calculateSalt() {
+            // Get input values
+            const poolVolume = parseFloat(document.getElementById('poolVolume').value);
+            const currentSalt = parseFloat(document.getElementById('currentSalt').value); // Assuming ppm
+            const desiredSalt = parseFloat(document.getElementById('desiredSalt').value); // Assuming ppm
+
+            const resultArea = document.getElementById('resultArea');
+            const messageArea = document.getElementById('messageArea');
+
+            // Reset previous messages and results
+            resultArea.classList.add('hidden');
+            messageArea.classList.add('hidden');
+            messageArea.textContent = '';
+            messageArea.classList.remove('bg-green-100', 'border-green-200', 'text-green-700'); // Reset success styling
+            messageArea.classList.add('bg-red-100', 'border-red-200', 'text-red-700'); // Default to error styling
+
+            // Input validation
+            if (isNaN(poolVolume) || isNaN(currentSalt) || isNaN(desiredSalt)) {
+                messageArea.textContent = 'Por favor, introduce valores numéricos válidos en todos los campos.';
+                messageArea.classList.remove('hidden');
+                return;
+            }
+
+            if (poolVolume <= 0) {
+                messageArea.textContent = 'El volumen de la piscina debe ser mayor que cero.';
+                messageArea.classList.remove('hidden');
+                return;
+            }
+
+            if (currentSalt < 0 || desiredSalt < 0) {
+                messageArea.textContent = 'Los niveles de sal no pueden ser negativos.';
+                messageArea.classList.remove('hidden');
+                return;
+            }
+
+            if (desiredSalt < currentSalt) {
+                messageArea.textContent = 'El nivel de sal deseado no puede ser menor que el nivel de sal actual. Si tu nivel es demasiado alto, necesitarás diluir el agua.';
+                messageArea.classList.remove('hidden');
+                return;
+            }
+
+            // Calculate salt needed (converting ppm to g/L by dividing by 1000)
+            // (desiredSalt - currentSalt) is in ppm
+            // Dividing by 1000 converts (ppm) to (g/L)
+            // Then multiplying by poolVolume (m³) gives kg
+            const saltToAdd = poolVolume * (desiredSalt - currentSalt) / 1000;
+
+            // Display result
+            if (saltToAdd > 0) {
+                resultArea.textContent = `Necesitas añadir ${saltToAdd.toFixed(2)} kg de sal.`;
+                resultArea.classList.remove('hidden');
+                messageArea.textContent = 'Recuerda añadir la sal gradualmente y con la bomba de filtración en marcha para una correcta disolución.';
+                messageArea.classList.remove('hidden');
+                messageArea.classList.remove('bg-red-100', 'border-red-200', 'text-red-700');
+                messageArea.classList.add('bg-green-100', 'border-green-200', 'text-green-700');
+            } else {
+                resultArea.textContent = '¡Tu nivel de sal ya es el adecuado!';
+                resultArea.classList.remove('hidden');
+                messageArea.textContent = 'No necesitas añadir sal en este momento. Mantén un monitoreo regular.';
+                messageArea.classList.remove('hidden');
+                messageArea.classList.remove('bg-red-100', 'border-red-200', 'text-red-700');
+                messageArea.classList.add('bg-green-100', 'border-green-200', 'text-green-700');
+            }
+        }
+    </script>
+</body>
+</html>

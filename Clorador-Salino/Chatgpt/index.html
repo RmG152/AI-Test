@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Sal para Piscina</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f0f0f0;
+    }
+    .container {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    #resultado {
+      margin-top: 1.5rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Calculadora de Sal para Piscina</h2>
+    <label for="volumen">Volumen (m³):</label>
+    <input type="number" id="volumen" placeholder="Ej: 40">
+
+    <label for="ppmActual">PPM actuales:</label>
+    <input type="number" id="ppmActual" placeholder="Ej: 1500">
+
+    <label for="ppmDeseado">PPM deseados:</label>
+    <input type="number" id="ppmDeseado" placeholder="Ej: 5000">
+
+    <button onclick="calcularSal()">Calcular</button>
+
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    function calcularSal() {
+      const volumen = parseFloat(document.getElementById('volumen').value);
+      const ppmActual = parseFloat(document.getElementById('ppmActual').value);
+      const ppmDeseado = parseFloat(document.getElementById('ppmDeseado').value);
+
+      if (isNaN(volumen) || isNaN(ppmActual) || isNaN(ppmDeseado)) {
+        document.getElementById('resultado').innerText = 'Completa todos los campos correctamente.';
+        return;
+      }
+
+      const delta = ppmDeseado - ppmActual;
+      if (delta <= 0) {
+        document.getElementById('resultado').innerText = 'No es necesario añadir sal.';
+        return;
+      }
+
+      const salKg = (volumen * delta) / 1000;
+      document.getElementById('resultado').innerText = `Debes añadir aproximadamente ${salKg.toFixed(2)} kg de sal.`;
+    }
+  </script>
+</body>
+</html>

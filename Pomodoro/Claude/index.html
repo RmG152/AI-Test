@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ef4444">
+    <title>Multi Pomodoro</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiTXVsdGkgUG9tb2Rvcm8gVGltZXIiLCJzaG9ydF9uYW1lIjoiUG9tb2Rvcm8iLCJzdGFydF91cmwiOiIvIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzFmMjkzNyIsInRoZW1lX2NvbG9yIjoiI2VmNDQ0NCIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhkQ2IzZzlJakFnTUNBMU1USWdOVEV5SWo0S0lDQWdQSEpsWTNRZ2VEMGlOalFpSUhrOUlqWTBJaUIzYVdSMGFEMGlNemcwSWlCb1pXbG5hSFE5SWpNNE5DSWdabWxzYkQwaVkyeGhjM005SW5CeWFXMWhjbmtpSUhKNFBTSXpNaUl2UGdvZ0lDQWdQSFJsZUhRZ2VEMGlNalUySWlCNVBTSXlOVFlpSUhSbGVIUXRZVzVqYUc5eVBTSnRhV1JrYkdVaUlHWnZiblF0YzJsNlpUMGlOREFpSUdacGJHdzlJbmRvYVhSbElqNWJQSzl2UEdSeVBqeDJhVzUzUHo0OEwzUmxlSFErQ2p3dmMzWm5QZ289IiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJzaXplcyI6IjUxMng1MTIifV19">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8cmVjdCB4PSI2NCIgeT0iNjQiIHdpZHRoPSIzODQiIGhlaWdodD0iMzg0IiBmaWxsPSJjbGFzcz0icHJpbWFyeSIgcng9IjMyIi8+CiAgPHRleHQgeD0iMjU2IiB5PSIyNTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNDAiIGZpbGw9IndoaXRlIj5bPC9vPGRyPjx2aW4zPz4</text>
+</svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1f2937, #374151);
+            color: white;
+            min-height: 100vh;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .app-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #ef4444, #f97316, #eab308);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .app-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .timers-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .timer-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .timer-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #a855f7);
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .timer-card.active::before {
+            opacity: 1;
+            animation: borderGlow 2s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .timer-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .timer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .timer-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .timer-name:focus {
+            outline: none;
+            border-bottom-color: #ef4444;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .timer-display {
+            font-size: 4rem;
+            font-weight: 700;
+            margin: 1.5rem 0;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+            background: linear-gradient(45deg, #ef4444, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .timer-phase {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .phase-work {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .phase-short-break {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .phase-long-break {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .timer-controls .btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+        }
+
+        .timer-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ef4444;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444, #f97316);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(239, 68, 68, 0.8);
+            transform: scale(1.1);
+        }
+
+        .floating-action {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .floating-action:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .notification-permission {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .app-title {
+                font-size: 2rem;
+            }
+            
+            .timer-display {
+                font-size: 3rem;
+            }
+            
+            .timers-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                justify-content: stretch;
+            }
+            
+            .btn {
+                flex: 1;
+                min-width: 0;
+            }
+        }
+
+        /* Animaciones adicionales */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .timer-card.active .timer-display {
+            animation: pulse 2s infinite;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <h1 class="app-title">🍅 Multi Pomodoro</h1>
+        <p class="app-subtitle">Gestiona múltiples sesiones de trabajo simultáneamente</p>
+    </div>
+
+    <div id="notificationPermission" class="notification-permission" style="display: none;">
+        <p>¿Permitir notificaciones para alertas de timer?</p>
+        <button class="btn btn-primary" onclick="requestNotificationPermission()">Permitir</button>
+        <button class="btn btn-secondary" onclick="dismissNotification()">Más tarde</button>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-primary" onclick="addTimer()">+ Nuevo Pomodoro</button>
+        <button class="btn btn-secondary" onclick="startAllTimers()">▶ Iniciar Todos</button>
+        <button class="btn btn-danger" onclick="pauseAllTimers()">⏸ Pausar Todos</button>
+        <button class="btn btn-success" onclick="resetAllTimers()">🔄 Reset Todos</button>
+    </div>
+
+    <div id="timersContainer" class="timers-container">
+        <!-- Los timers se generan dinámicamente -->
+    </div>
+
+    <button class="floating-action" onclick="addTimer()" title="Agregar nuevo pomodoro">+</button>
+
+    <script>
+        class PomodoroTimer {
+            constructor(id, name = `Pomodoro ${id}`) {
+                this.id = id;
+                this.name = name;
+                this.workTime = 25 * 60; // 25 minutos
+                this.shortBreak = 5 * 60; // 5 minutos
+                this.longBreak = 15 * 60; // 15 minutos
+                this.currentTime = this.workTime;
+                this.isRunning = false;
+                this.phase = 'work'; // work, shortBreak, longBreak
+                this.pomodoros = 0;
+                this.totalPomodoros = 0;
+                this.interval = null;
+                this.originalTime = this.workTime;
+                this.element = null;
+                
+                this.createDOM();
+                this.updateDisplay();
+            }
+
+            createDOM() {
+                const container = document.getElementById('timersContainer');
+                const timerDiv = document.createElement('div');
+                timerDiv.className = 'timer-card fade-in';
+                timerDiv.id = `timer-${this.id}`;
+                
+                timerDiv.innerHTML = `
+                    <button class="close-btn" onclick="removeTimer(${this.id})">×</button>
+                    <div class="timer-header">
+                        <input type="text" class="timer-name" value="${this.name}" 
+                               onchange="updateTimerName(${this.id}, this.value)">
+                    </div>
+                    <div class="timer-phase phase-${this.phase}">${this.getPhaseText()}</div>
+                    <div class="timer-display" id="display-${this.id}">${this.formatTime(this.currentTime)}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-${this.id}" style="width: 100%"></div>
+                    </div>
+                    <div class="timer-controls">
+                        <button class="btn btn-success" onclick="toggleTimer(${this.id})">
+                            <span id="play-btn-${this.id}">▶ Play</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetTimer(${this.id})">🔄 Reset</button>
+                        <button class="btn btn-primary" onclick="nextPhase(${this.id})">⏭ Siguiente</button>
+                    </div>
+                    <div class="timer-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="current-pomodoros-${this.id}">${this.pomodoros}</div>
+                            <div class="stat-label">Pomodoros Hoy</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="total-pomodoros-${this.id}">${this.totalPomodoros}</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">${Math.floor(this.workTime / 60)}</div>
+                            <div class="stat-label">Min/Sesión</div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(timerDiv);
+                this.element = timerDiv;
+            }
+
+            getPhaseText() {
+                switch(this.phase) {
+                    case 'work': return '🔥 Trabajando';
+                    case 'shortBreak': return '☕ Descanso Corto';
+                    case 'longBreak': return '🌴 Descanso Largo';
+                    default: return '🔥 Trabajando';
+                }
+            }
+
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            updateDisplay() {
+                const display = document.getElementById(`display-${this.id}`);
+                const progress = document.getElementById(`progress-${this.id}`);
+                const playBtn = document.getElementById(`play-btn-${this.id}`);
+                const phaseElement = this.element.querySelector('.timer-phase');
+                
+                if (display) display.textContent = this.formatTime(this.currentTime);
+                if (playBtn) playBtn.textContent = this.isRunning ? '⏸ Pause' : '▶ Play';
+                
+                // Actualizar progreso
+                if (progress) {
+                    const progressPercent = ((this.originalTime - this.currentTime) / this.originalTime) * 100;
+                    progress.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
+                }
+                
+                // Actualizar fase
+                if (phaseElement) {
+                    phaseElement.textContent = this.getPhaseText();
+                    phaseElement.className = `timer-phase phase-${this.phase}`;
+                }
+                
+                // Actualizar clase activa
+                if (this.isRunning) {
+                    this.element.classList.add('active');
+                } else {
+                    this.element.classList.remove('active');
+                }
+                
+                // Actualizar estadísticas
+                const currentPomodorosEl = document.getElementById(`current-pomodoros-${this.id}`);
+                const totalPomodorosEl = document.getElementById(`total-pomodoros-${this.id}`);
+                if (currentPomodorosEl) currentPomodorosEl.textContent = this.pomodoros;
+                if (totalPomodorosEl) totalPomodorosEl.textContent = this.totalPomodoros;
+            }
+
+            start() {
+                if (this.isRunning) return;
+                
+                this.isRunning = true;
+                this.interval = setInterval(() => {
+                    this.currentTime--;
+                    this.updateDisplay();
+                    
+                    if (this.currentTime <= 0) {
+                        this.completePhase();
+                    }
+                }, 1000);
+                
+                this.updateDisplay();
+            }
+
+            pause() {
+                this.isRunning = false;
+                if (this.interval) {
+                    clearInterval(this.interval);
+                    this.interval = null;
+                }
+                this.updateDisplay();
+            }
+
+            toggle() {
+                if (this.isRunning) {
+                    this.pause();
+                } else {
+                    this.start();
+                }
+            }
+
+            reset() {
+                this.pause();
+                this.currentTime = this.originalTime;
+                this.updateDisplay();
+            }
+
+            completePhase() {
+                this.pause();
+                
+                // Reproducir sonido y mostrar notificación
+                this.playNotificationSound();
+                this.showNotification();
+                
+                if (this.phase === 'work') {
+                    this.pomodoros++;
+                    this.totalPomodoros++;
+                    
+                    // Cada 4 pomodoros, descanso largo
+                    if (this.pomodoros % 4 === 0) {
+                        this.phase = 'longBreak';
+                        this.currentTime = this.longBreak;
+                        this.originalTime = this.longBreak;
+                    } else {
+                        this.phase = 'shortBreak';
+                        this.currentTime = this.shortBreak;
+                        this.originalTime = this.shortBreak;
+                    }
+                } else {
+                    // Volver al trabajo
+                    this.phase = 'work';
+                    this.currentTime = this.workTime;
+                    this.originalTime = this.workTime;
+                }
+                
+                this.updateDisplay();
+            }
+
+            nextPhase() {
+                this.completePhase();
+            }
+
+            playNotificationSound() {
+                // Crear un tono usando Web Audio API
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            }
+
+            showNotification() {
+                if (Notification.permission === 'granted') {
+                    const title = this.phase === 'work' ? 
+                        `${this.name} - ¡Pomodoro Completado!` : 
+                        `${this.name} - ¡Descanso Terminado!`;
+                    
+                    const body = this.phase === 'work' ? 
+                        'Hora del descanso 🌟' : 
+                        '¡De vuelta al trabajo! 💪';
+                    
+                    new Notification(title, {
+                        body: body,
+                        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8cmVjdCB4PSI2NCIgeT0iNjQiIHdpZHRoPSIzODQiIGhlaWdodD0iMzg0IiBmaWxsPSIjZWY0NDQ0IiByeD0iMzIiLz4KICA8dGV4dCB4PSIyNTYiIHk9IjI1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI0MCIgZmlsbD0id2hpdGUiPvCfjaU8L3RleHQ+Cjwvc3ZnPg=='
+                    });
+                }
+            }
+        }
+
+        // Estado global de la aplicación
+        let timers = {};
+        let nextId = 1;
+
+        // Funciones globales
+        function addTimer() {
+            const timer = new PomodoroTimer(nextId);
+            timers[nextId] = timer;
+            nextId++;
+            
+            // Solicitar permisos de notificación si es la primera vez
+            if (Object.keys(timers).length === 1 && Notification.permission === 'default') {
+                document.getElementById('notificationPermission').style.display = 'block';
+            }
+        }
+
+        function removeTimer(id) {
+            if (timers[id]) {
+                timers[id].pause();
+                const element = document.getElementById(`timer-${id}`);
+                if (element) {
+                    element.style.animation = 'fadeOut 0.3s ease-out';
+                    setTimeout(() => {
+                        element.remove();
+                    }, 300);
+                }
+                delete timers[id];
+            }
+        }
+
+        function toggleTimer(id) {
+            if (timers[id]) {
+                timers[id].toggle();
+            }
+        }
+
+        function resetTimer(id) {
+            if (timers[id]) {
+                timers[id].reset();
+            }
+        }
+
+        function nextPhase(id) {
+            if (timers[id]) {
+                timers[id].nextPhase();
+            }
+        }
+
+        function updateTimerName(id, newName) {
+            if (timers[id]) {
+                timers[id].name = newName;
+            }
+        }
+
+        function startAllTimers() {
+            Object.values(timers).forEach(timer => timer.start());
+        }
+
+        function pauseAllTimers() {
+            Object.values(timers).forEach(timer => timer.pause());
+        }
+
+        function resetAllTimers() {
+            Object.values(timers).forEach(timer => timer.reset());
+        }
+
+        function requestNotificationPermission() {
+            Notification.requestPermission().then(permission => {
+                dismissNotification();
+            });
+        }
+
+        function dismissNotification() {
+            document.getElementById('notificationPermission').style.display = 'none';
+        }
+
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'multi-pomodoro-v1';
+                const urlsToCache = ['/'];
+                
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.addAll(urlsToCache))
+                    );
+                });
+                
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => response || fetch(event.request))
+                    );
+                });
+            `;
+            
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            
+            navigator.serviceWorker.register(swUrl);
+        }
+
+        // Animación de fadeOut
+        const fadeOutStyle = document.createElement('style');
+        fadeOutStyle.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: scale(1); }
+                to { opacity: 0; transform: scale(0.8); }
+            }
+        `;
+        document.head.appendChild(fadeOutStyle);
+
+        // Inicialización de la aplicación
+        function initApp() {
+            // Crear un timer inicial
+            addTimer();
+            
+            // Configurar eventos de teclado
+            document.addEventListener('keydown', (e) => {
+                if (e.key === ' ' && e.ctrlKey) {
+                    e.preventDefault();
+                    addTimer();
+                } else if (e.key === 'Enter' && e.ctrlKey) {
+                    e.preventDefault();
+                    startAllTimers();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    pauseAllTimers();
+                }
+            });
+
+            // Prevenir que la pantalla se apague en móviles
+            if ('wakeLock' in navigator) {
+                let wakeLock = null;
+                
+                async function requestWakeLock() {
+                    try {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                    } catch (err) {
+                        console.log('Wake Lock no disponible:', err);
+                    }
+                }
+                
+                // Solicitar wake lock cuando haya timers activos
+                setInterval(() => {
+                    const hasActiveTimers = Object.values(timers).some(timer => timer.isRunning);
+                    if (hasActiveTimers && (!wakeLock || wakeLock.released)) {
+                        requestWakeLock();
+                    }
+                }, 30000); // Verificar cada 30 segundos
+            }
+
+            // Configurar persistencia local (usando variables en memoria)
+            window.appData = {
+                timers: {},
+                settings: {
+                    soundEnabled: true,
+                    notificationsEnabled: true,
+                    darkMode: true
+                }
+            };
+
+            // Guardar estado periódicamente
+            setInterval(saveAppState, 30000);
+        }
+
+        function saveAppState() {
+            const state = {
+                timers: {},
+                nextId: nextId
+            };
+            
+            Object.keys(timers).forEach(id => {
+                const timer = timers[id];
+                state.timers[id] = {
+                    name: timer.name,
+                    currentTime: timer.currentTime,
+                    phase: timer.phase,
+                    pomodoros: timer.pomodoros,
+                    totalPomodoros: timer.totalPomodoros,
+                    isRunning: timer.isRunning
+                };
+            });
+            
+            window.appData.currentState = state;
+        }
+
+        function loadAppState() {
+            if (window.appData && window.appData.currentState) {
+                const state = window.appData.currentState;
+                nextId = state.nextId || 1;
+                
+                Object.keys(state.timers || {}).forEach(id => {
+                    const timerData = state.timers[id];
+                    const timer = new PomodoroTimer(parseInt(id), timerData.name);
+                    timer.currentTime = timerData.currentTime;
+                    timer.phase = timerData.phase;
+                    timer.pomodoros = timerData.pomodoros;
+                    timer.totalPomodoros = timerData.totalPomodoros;
+                    
+                    timers[id] = timer;
+                    timer.updateDisplay();
+                    
+                    if (timerData.isRunning) {
+                        timer.start();
+                    }
+                });
+            }
+        }
+
+        // Configuraciones adicionales
+        function showSettings() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: linear-gradient(135deg, #1f2937, #374151);
+                    border-radius: 20px;
+                    padding: 2rem;
+                    max-width: 400px;
+                    width: 90%;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                ">
+                    <h2 style="color: white; margin-bottom: 1.5rem; text-align: center;">⚙️ Configuración</h2>
+                    <div style="color: white; margin-bottom: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="soundEnabled" ${window.appData.settings.soundEnabled ? 'checked' : ''}>
+                            <span>Sonidos de notificación</span>
+                        </label>
+                    </div>
+                    <div style="color: white; margin-bottom: 1.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="notificationsEnabled" ${window.appData.settings.notificationsEnabled ? 'checked' : ''}>
+                            <span>Notificaciones del navegador</span>
+                        </label>
+                    </div>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button class="btn btn-primary" onclick="saveSettings()">Guardar</button>
+                        <button class="btn btn-secondary" onclick="closeSettings()">Cancelar</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        function saveSettings() {
+            window.appData.settings.soundEnabled = document.getElementById('soundEnabled').checked;
+            window.appData.settings.notificationsEnabled = document.getElementById('notificationsEnabled').checked;
+            closeSettings();
+        }
+
+        function closeSettings() {
+            if (window.currentModal) {
+                window.currentModal.remove();
+                window.currentModal = null;
+            }
+        }
+
+        // Agregar botón de configuración
+        function addSettingsButton() {
+            const settingsBtn = document.createElement('button');
+            settingsBtn.className = 'btn btn-secondary';
+            settingsBtn.innerHTML = '⚙️ Config';
+            settingsBtn.onclick = showSettings;
+            
+            const controls = document.querySelector('.controls');
+            controls.appendChild(settingsBtn);
+        }
+
+        // Función para exportar a Android usando Cordova/PhoneGap
+        function setupAndroidExport() {
+            // Información para desarrolladores sobre cómo exportar
+            window.androidExportInfo = {
+                framework: 'Cordova/PhoneGap',
+                commands: [
+                    'npm install -g cordova',
+                    'cordova create MultiPomodoro com.tudominio.multipomodoro "Multi Pomodoro"',
+                    'cd MultiPomodoro',
+                    'cordova platform add android',
+                    '// Copiar este HTML a www/index.html',
+                    'cordova build android',
+                    'cordova run android'
+                ],
+                configXml: `
+                    <widget id="com.tudominio.multipomodoro" version="1.0.0">
+                        <name>Multi Pomodoro</name>
+                        <description>Aplicación de múltiples pomodoros</description>
+                        <content src="index.html" />
+                        <access origin="*" />
+                        <preference name="DisallowOverscroll" value="true" />
+                        <preference name="android-minSdkVersion" value="22" />
+                        <preference name="android-targetSdkVersion" value="30" />
+                        <plugin name="cordova-plugin-whitelist" version="1" />
+                        <plugin name="cordova-plugin-vibration" version="3" />
+                    </widget>
+                `,
+                pwaManifest: {
+                    name: "Multi Pomodoro Timer",
+                    short_name: "Pomodoro",
+                    start_url: "/",
+                    display: "standalone",
+                    background_color: "#1f2937",
+                    theme_color: "#ef4444",
+                    icons: [
+                        {
+                            src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8cmVjdCB4PSI2NCIgeT0iNjQiIHdpZHRoPSIzODQiIGhlaWdodD0iMzg0IiBmaWxsPSIjZWY0NDQ0IiByeD0iMzIiLz4KICA8dGV4dCB4PSIyNTYiIHk9IjI1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI0MCIgZmlsbD0id2hpdGUiPvCfjaU8L3RleHQ+Cjwvc3ZnPg==",
+                            type: "image/svg+xml",
+                            sizes: "512x512"
+                        }
+                    ]
+                }
+            };
+        }
+
+        // Añadir soporte para vibración en móviles
+        function vibrate(pattern = [200]) {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(pattern);
+            }
+        }
+
+        // Modificar la función de notificación para incluir vibración
+        PomodoroTimer.prototype.showNotification = function() {
+            // Vibrar
+            vibrate([300, 100, 300]);
+            
+            if (window.appData.settings.notificationsEnabled && Notification.permission === 'granted') {
+                const title = this.phase === 'work' ? 
+                    `${this.name} - ¡Pomodoro Completado!` : 
+                    `${this.name} - ¡Descanso Terminado!`;
+                
+                const body = this.phase === 'work' ? 
+                    'Hora del descanso 🌟' : 
+                    '¡De vuelta al trabajo! 💪';
+                
+                const notification = new Notification(title, {
+                    body: body,
+                    icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8cmVjdCB4PSI2NCIgeT0iNjQiIHdpZHRoPSIzODQiIGhlaWdodD0iMzg0IiBmaWxsPSIjZWY0NDQ0IiByeD0iMzIiLz4KICA8dGV4dCB4PSIyNTYiIHk9IjI1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI0MCIgZmlsbD0id2hpdGUiPvCfjaU8L3RleHQ+Cjwvc3ZnPg==',
+                    badge: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjI1NiIgZmlsbD0iI2VmNDQ0NCIvPgo8L3N2Zz4=',
+                    requireInteraction: true
+                });
+                
+                // Auto-cerrar después de 5 segundos
+                setTimeout(() => notification.close(), 5000);
+            }
+        };
+
+        // Modificar playNotificationSound para usar configuración
+        PomodoroTimer.prototype.playNotificationSound = function() {
+            if (!window.appData.settings.soundEnabled) return;
+            
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (error) {
+                console.log('Error reproduciendo sonido:', error);
+            }
+        };
+
+        // Inicializar la aplicación cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+            addSettingsButton();
+            setupAndroidExport();
+            
+            // Mostrar información de exportación en consola
+            console.log('%c🚀 Multi Pomodoro App', 'color: #ef4444; font-size: 20px; font-weight: bold;');
+            console.log('%cPara exportar a Android:', 'color: #10b981; font-size: 14px; font-weight: bold;');
+            console.log('window.androidExportInfo contiene toda la información necesaria');
+            console.log('%cAtajos de teclado:', 'color: #3b82f6; font-size: 14px; font-weight: bold;');
+            console.log('• Ctrl + Espacio: Nuevo pomodoro');
+            console.log('• Ctrl + Enter: Iniciar todos');
+            console.log('• Escape: Pausar todos');
+        });
+
+        // Prevenir zoom en móviles al hacer doble tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Función para mostrar información de desarrollo
+        function showDevInfo() {
+            const info = `
+                🍅 MULTI POMODORO APP - INFORMACIÓN DE DESARROLLO
+                
+                📱 EXPORTACIÓN A ANDROID:
+                
+                1. USANDO CORDOVA/PHONEGAP:
+                   • npm install -g cordova
+                   • cordova create MultiPomodoro
+                   • cordova platform add android
+                   • Copiar este HTML completo a www/index.html
+                   • cordova build android
+                
+                2. USANDO CAPACITOR (Recomendado):
+                   • npm install @capacitor/core @capacitor/cli
+                   • npx cap init
+                   • npx cap add android
+                   • Copiar archivos web a carpeta del proyecto
+                   • npx cap run android
+                
+                3. COMO PWA (Progressive Web App):
+                   • Ya incluye manifest.json
+                   • Service Worker registrado
+                   • Funciona offline
+                   • Se puede "instalar" desde el navegador
+                
+                🎮 CONTROLES:
+                • Ctrl + Space: Nuevo pomodoro
+                • Ctrl + Enter: Iniciar todos
+                • Escape: Pausar todos
+                
+                💾 PERSISTENCIA:
+                • Estado guardado en memoria durante la sesión
+                • Wake Lock para mantener pantalla activa
+                • Notificaciones y sonidos configurables
+                
+                🔧 CARACTERÍSTICAS:
+                • Múltiples timers simultáneos
+                • Progreso visual animado
+                • Notificaciones del sistema
+                • Vibración en móviles
+                • Responsive design
+                • Tema oscuro moderno
+            `;
+            
+            alert(info);
+        }
+
+        // Añadir función global para mostrar información
+        window.showDevInfo = showDevInfo;
